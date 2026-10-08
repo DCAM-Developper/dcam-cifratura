@@ -1,0 +1,120 @@
+{
+  "versione": "0.1.0",
+  "nota": "Buste del protocollo v1 prodotte con chiavi fisse. Ogni implementazione deve aprirle.",
+  "aad": {
+    "campi": [
+      "obj",
+      "org-esempio",
+      "part",
+      "obj-1",
+      3,
+      "meta",
+      7
+    ],
+    "hex": "6463616d2e7269736572766174612e7631006f626a006f72672d6573656d70696f0070617274006f626a2d310033006d6574610037"
+  },
+  "chiaveEpoca": "01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3da",
+  "indirizzo": {
+    "orgId": "org-esempio",
+    "kind": "part",
+    "objectId": "obj-1",
+    "rev": 3
+  },
+  "epoca": 7,
+  "DCR1_meta": {
+    "json": {
+      "nome": "flangia",
+      "spessore": 3
+    },
+    "busta": "4443523101000000074df34ee2879d1f190eafac87c4cd0b268d7f559e75f627d2a87377ec58d91b125bf551bb1153d5f2cf32bb1b38352eb61e555f7926ef30a2440a5aec"
+  },
+  "DCR1_body": {
+    "testo": "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+    "busta": "444352310100000007d2faec1bc3c628aa5971f15de7569d008c9099e0d2944ef341fd49b0cbbf2dd9adf37e77f61e488db7e10dd774a330e29178a8ce"
+  },
+  "DCM1": {
+    "elenco": {
+      "v": 1,
+      "orgId": "org-esempio",
+      "epoch": 7,
+      "seq": 2,
+      "recovery": {
+        "pubKey": "BDz9qasEXve6IRwxIVjgjpH9UcjNybKgQYOfmJgPW989fFHIJDp2pgCEVEJvciz7BRmfs-Za9p8cOHJYJ9kMRYQ"
+      },
+      "recipients": [
+        {
+          "kind": "device",
+          "id": "dev-1",
+          "userId": "u-1",
+          "pubKey": "BDz9qasEXve6IRwxIVjgjpH9UcjNybKgQYOfmJgPW989fFHIJDp2pgCEVEJvciz7BRmfs-Za9p8cOHJYJ9kMRYQ",
+          "addedBy": "u-1",
+          "addedAt": 1700000000000
+        }
+      ]
+    },
+    "busta": "44434d313d081a338592f6713f3fa7385cc4585e1168fff622c1618b254b13f42e0239f48acb0ea41108bfb55e46ed137d8318ff6f668f5df5138de540b38f9f300980d51178f2f6865a49c0acc659cb6462f45728efa0b29343fdaae2c2d5be66a3694286e4d243520892b580df10db8989da7251b9be8892915f2016d706ebdcdd0ab77870c507eaae9e102c64bb39364b58a74e2e1665bee37c1328753c81568e3684c3c814e91a812e7896affe305ee0298688b16db30f981e2bdd64dc054738831d99d997827f1128a5351bc76844cd440dfb1c87c2daf0347b81b403c483aa7ce415b34cb0887f84158f661d4d46acd39c1f88e2d11e2be8f8195705772d40eeb0ef3906fe8a5d74ccabac249c4e22008cb6bcd273a7a9369d3dc11e480835b7b8f074f29b668fc2b95db4789733b22606614b6fb6c1ee62772314df68003e311febc71ddc179f26559e272f5654a166c9842c3558c597232a880bdd0a3eb0092d9141f84747deb0acc259610b7409c9263afbe59ab9be9ce7f5ac7e837ed2f8cad4a645"
+  },
+  "destinatario": {
+    "pkcs8": "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b02010104205ad633ea3d79aea769a493242a97f86e7333ddfb818f43febfa4f157aafa6e6fa144034200043cfda9ab045ef7ba211c312158e08e91fd51c8cdc9b2a041839f98980f5bdf3d7c51c8243a76a6008454426f722cfb05199fb3e65af69f1c38725827d90c4584",
+    "pub": "043cfda9ab045ef7ba211c312158e08e91fd51c8cdc9b2a041839f98980f5bdf3d7c51c8243a76a6008454426f722cfb05199fb3e65af69f1c38725827d90c4584"
+  },
+  "chiusura": {
+    "contesto": {
+      "orgId": "org-esempio",
+      "epoch": 7,
+      "kind": "device",
+      "id": "dev-1"
+    },
+    "chiusa": "04b92a787893281e87cd1cf44e684a0f4419c1fb2e50239346a5272b4d80f6a109406daef79772741b46ac5c9b9f35e60255ec95ac8b7f43fca0e00a65d756ba6085516fbb3741a315d6e75320e3ee25cce857185873be0b0469468b7c96c82aa2bcd6bc03a60f8f78dbac77a368908749"
+  },
+  "DCS1_persona": {
+    "orgId": "org-esempio",
+    "userId": "u-1",
+    "frase": "una frase lunga di prova",
+    "record": {
+      "pubKey": "BNXkObplHXVji1hUUUJsOWNnmga7v8Y3JC3Rj8w22I5LsIuwlyPW5dMbA-pR2qhjkHuqKTM_nhHQKY00XII2XeA",
+      "sealedPriv": "RENTMRygngWJTt41vQhG3PFiunBHpShPXqy7yhODet-7u3IFKyqSkapuL4UgbJiR6DQgIfCG-IJ6ozNaDdCbc-2okkUKzmXIizmNMnq4cu8Lj9eOqPz1W3MLRboZ3BYGv9zF-ZtRvYb0n3-cRAchT0g4HjcfSe8tgxcelT0NGg1Vu34NDNn5MIcQTKTqYzSnbh0qgFll6LsKpKtujbNeXAEDgddBtAjQPkU",
+      "kdf": {
+        "alg": "argon2id13",
+        "ops": 3,
+        "mem": 67108864,
+        "salt": "CRAXHiUsMzpBSE9WXWRrcg"
+      }
+    }
+  },
+  "recupero": {
+    "orgId": "org-esempio",
+    "R": "a7ca4886513ab7023b951f363c8b6e041a96c305153af6e6b712f3eb7ad2c70f",
+    "pub": "04510b7bf684ee820a8411ba2c15a1dae201355a0912983c4aea0a3b8679a05b8234bd67c2b15fd5c2df6bb2eb07949fbbc68a65037e8d8f298b737c48988deb94",
+    "sealedPriv": "44435331b657db9126f6ae128fde77c0c1a91f68e3d8d067197faa9919b611ee236c1fdb4e036a392526bf04fb9d12661e9af3567f4fd824877a7b4a220b02a4ceae31f274fc8231f8d22b50108908b402ac46b540b891b47f75eef2ac40644b56fcfc4b5195508265123a081f40e44c4a86042e18b9254f89353c016864f932c20bd760bb211559eb4e2d3c3857e3bba4e695d94ac63cf432016e5f61bd4abae8755217a43eed792acb",
+    "parti": [
+      "8816b84213fd7219ab6f3895107adfdfaebc2960acfa95a47ae24d143b57e0c5a8",
+      "cd9fec670740d62d7946199ccdaf07fcc54ac85510ed8bb0bab65b8eb7fec1af5d",
+      "6c1580e3a4836f642da34b932bfe8fc58422d0a46b9df413f0da93a2539e9356e6"
+    ]
+  },
+  "custodia": {
+    "orgId": "org-esempio",
+    "parteB": "cd9fec670740d62d7946199ccdaf07fcc54ac85510ed8bb0bab65b8eb7fec1af5d",
+    "chiusa": "048cb222f64eb003da67825c56f72925ba5928eb0a46e590809e97fc04115ccc18901100edb0f15ec0acd9e43bbadcc74483855cfb13f9d0e8848db3392e341754637d35e831183b89a44d9f55d38df18d5d678cc9379d5bd885c7d058ab1d3eb4ddf3ce30aa3597c11814b2572b61108066"
+  },
+  "DCS1_trasferimento": {
+    "codice": "ABCDEFGHJKMNPQRSTVWX",
+    "transferId": "t-1",
+    "orgId": "org-esempio",
+    "forUserId": "u-2",
+    "pacchetto": {
+      "orgId": "org-esempio",
+      "forUserId": "u-2",
+      "epochs": {
+        "7": "AQgPFh0kKzI5QEdOVVxjanF4f4aNlJuiqbC3vsXM09o"
+      },
+      "manifest": {
+        "epoch": 7,
+        "seq": 2,
+        "blob": "x"
+      }
+    },
+    "busta": "44435331d15c75c724d642ec31b6acc778d661ebcd551b397542568be25d3789ed99f85cb38a264ffcca105f4f0610abd067a47ced2950a0c114d3581e47487424cfc151bb3fee89ddaaf14d6fde2df5120d28a7e02c647eb585d3e1e6aabdde6f59a11d6e47184e63c7f342ed101a2b129ec996bbbd226ed863dd201d20f23bdbf1681821854f4382a8f64111208528a2515838ee265900337238a6592760eab9543fa1211f394d5a1b3283e4134b9a"
+  }
+}
