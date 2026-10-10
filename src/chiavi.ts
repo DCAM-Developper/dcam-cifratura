@@ -100,14 +100,21 @@ export type ParametriKdf = { alg: 'argon2id13'; ops: number; mem: number; salt: 
 export const PARAMETRI_KDF = { alg: 'argon2id13', ops: 3, mem: 64 * 1024 * 1024 } as const;
 export const FRASE_MINIMA = 12;
 /** Parametri Argon2id accettati da chi apre (protocollo §2.1): il server non può imporre un costo enorme. */
-export const TETTI_KDF = { ops: [1, 10], mem: [8 * 1024 * 1024, 256 * 1024 * 1024], sale: 16 } as const;
+export const TETTI_KDF = {
+  ops: [1, 10],
+  mem: [8 * 1024 * 1024, 256 * 1024 * 1024],
+  sale: 16,
+} as const;
 
 function controllaKdf(p: ParametriKdf): void {
   const dentro = (v: unknown, [min, max]: readonly [number, number]) =>
     Number.isSafeInteger(v) && (v as number) >= min && (v as number) <= max;
   if (p.alg !== 'argon2id13') throw new ErroreRiservata('formato', `KDF sconosciuto ${p.alg}`);
   if (!dentro(p.ops, TETTI_KDF.ops) || !dentro(p.mem, TETTI_KDF.mem)) {
-    throw new ErroreRiservata('formato', `parametri KDF fuori dai tetti (ops ${p.ops}, mem ${p.mem})`);
+    throw new ErroreRiservata(
+      'formato',
+      `parametri KDF fuori dai tetti (ops ${p.ops}, mem ${p.mem})`
+    );
   }
   if (typeof p.salt !== 'string' || da64(p.salt).length !== TETTI_KDF.sale) {
     throw new ErroreRiservata('formato', 'sale KDF di lunghezza inattesa');

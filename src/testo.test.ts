@@ -24,8 +24,12 @@ describe('Crockford base32', () => {
   });
   test('carattere estraneo (U) o lunghezza sbagliata → ErroreRiservata «formato»', () => {
     expect(() => daBase32('U'.repeat(52), 32)).toThrow(ErroreRiservata);
-    expect(() => daBase32('U'.repeat(52), 32)).toThrow(expect.objectContaining({ codice: 'formato' }));
-    expect(() => daBase32('0'.repeat(10), 32)).toThrow(expect.objectContaining({ codice: 'formato' }));
+    expect(() => daBase32('U'.repeat(52), 32)).toThrow(
+      expect.objectContaining({ codice: 'formato' })
+    );
+    expect(() => daBase32('0'.repeat(10), 32)).toThrow(
+      expect.objectContaining({ codice: 'formato' })
+    );
   });
   test('gruppi da 4 separati da trattino', () => {
     expect(aGruppi('ABCDEFGHJK')).toBe('ABCD-EFGH-JK');

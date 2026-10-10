@@ -156,7 +156,7 @@ describe('recupero', () => {
       codice: 'parti',
     });
   });
-  test('la privata di recupero è legata alla sua pubblica: un\'altra pubblica non apre', async () => {
+  test("la privata di recupero è legata alla sua pubblica: un'altra pubblica non apre", async () => {
     const rec = await creaRecupero('org1', ANCORA);
     const altra = await pubblicaRaw((await generaCoppia(true)).publicKey);
     await expect(apriRecupero('org1', rec.R, altra, rec.sealedPriv)).rejects.toMatchObject({

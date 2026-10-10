@@ -96,16 +96,20 @@ export async function verificaTransizione(
     seq: t.prevSeq,
   });
   const chi = el.recipients.find(d => d.kind === 'device' && d.id === t.signerId);
-  if (!chi?.signKey) throw rifiuta(`la postazione ${t.signerId} non può firmare l'epoca ${t.epoch}`);
+  if (!chi?.signKey)
+    throw rifiuta(`la postazione ${t.signerId} non può firmare l'epoca ${t.epoch}`);
   if (t.sig.length !== FIRMA) throw rifiuta('firma di lunghezza inattesa');
-  const pub = await crypto.subtle.importKey(
-    'raw',
-    ab(da64(chi.signKey)),
-    CURVA_FIRMA,
-    false,
-    ['verify']
+  const pub = await crypto.subtle.importKey('raw', ab(da64(chi.signKey)), CURVA_FIRMA, false, [
+    'verify',
+  ]);
+  const m = await messaggio(
+    orgId,
+    t.epoch,
+    t.prevSeq,
+    await impegno(Enuova),
+    t.prevBlob,
+    t.signerId
   );
-  const m = await messaggio(orgId, t.epoch, t.prevSeq, await impegno(Enuova), t.prevBlob, t.signerId);
   if (!(await crypto.subtle.verify(ALG_FIRMA, pub, ab(t.sig), ab(m)))) {
     throw rifiuta(`la chiave dell'epoca ${t.epoch} non è firmata da una postazione dell'azienda`);
   }

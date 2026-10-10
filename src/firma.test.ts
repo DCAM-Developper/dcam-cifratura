@@ -1,12 +1,6 @@
 // Epoche firmate (protocollo §3.6, §4.5): la forgia del server rifiutata, l'epoca legittima accettata.
 import { describe, expect, test } from 'vitest';
-import {
-  generaChiaveEpoca,
-  generaCoppia,
-  pubblicaRaw,
-  chiudiPer,
-  apriPer,
-} from './chiavi';
+import { generaChiaveEpoca, generaCoppia, pubblicaRaw, chiudiPer, apriPer } from './chiavi';
 import { chiudiElenco, perRinnovo, type Elenco } from './elenco';
 import {
   generaCoppiaFirma,
@@ -239,9 +233,7 @@ describe('epoche firmate', () => {
 
   test('senza nessun impegno fidato non si accetta niente', async () => {
     const a = await azienda();
-    expect(await codice(verificaChiavi(orgId, new Map([[1, a.E1]]), new Map(), []))).toBe(
-      'firma'
-    );
+    expect(await codice(verificaChiavi(orgId, new Map([[1, a.E1]]), new Map(), []))).toBe('firma');
   });
 
   test('epoca senza la precedente (buco nella catena) → rifiutata', async () => {
@@ -287,9 +279,9 @@ describe('epoche firmate', () => {
       [2, E2],
     ]);
     const fidati = new Map([[1, await impegno(a.E1)]]);
-    expect(
-      await codice(verificaChiavi(orgId, chiavi, fidati, [t], { epoch: 1, seq: 3 }))
-    ).toBe('firma');
+    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [t], { epoch: 1, seq: 3 }))).toBe(
+      'firma'
+    );
     // sull'ultima seq vista, o senza memoria, la firma della postazione presente passa
     const t3 = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd2', altra.privateKey);
     await expect(

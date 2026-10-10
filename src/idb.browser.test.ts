@@ -20,7 +20,11 @@ const riapri = (nome: string) =>
     r.onsuccess = () => ok(r.result);
     r.onerror = () => ko(r.error);
   });
-const op = <T>(db: IDBDatabase, m: 'readonly' | 'readwrite', f: (s: IDBObjectStore) => IDBRequest) =>
+const op = <T>(
+  db: IDBDatabase,
+  m: 'readonly' | 'readwrite',
+  f: (s: IDBObjectStore) => IDBRequest
+) =>
   new Promise<T>((ok, ko) => {
     const r = f(db.transaction('k', m).objectStore('k'));
     r.onsuccess = () => ok(r.result as T);
