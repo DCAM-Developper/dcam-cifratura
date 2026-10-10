@@ -5,7 +5,7 @@ disegni, i pezzi e i nesting di un'azienda, in modo che il server li conservi se
 
 *English summary below.*
 
-> **Stato: 0.1.0, non ancora revisionato da terzi.** Il codice è quello in uso in DCAM. Una
+> **Stato: 0.2.0, non ancora revisionato da terzi.** Il codice è quello in uso in DCAM. Una
 > revisione di sicurezza esterna è prevista; fino ad allora nessuna affermazione di
 > «certificazione» o «verifica indipendente» vale per questo pacchetto.
 
@@ -13,12 +13,14 @@ disegni, i pezzi e i nesting di un'azienda, in modo che il server li conservi se
 
 - Cifra ogni versione di un oggetto (metadati, miniatura, contenuto) con AES-256-GCM, legata da un
   AAD a organizzazione, tipo, oggetto, revisione ed epoca: il server non può spostare o scambiare
-  un testo cifrato senza che l'apertura fallisca. Busta `DCR1`.
+  un testo cifrato senza che l'apertura fallisca. Busta `DCR2`.
 - Chiude la chiave d'azienda di ogni epoca per ciascun destinatario (persona, postazione,
   recupero) con **HPKE (RFC 9180)** su P-256.
-- Autentica l'elenco dei destinatari (busta `DCM1`): il server non può aggiungere qualcuno.
+- Autentica l'elenco dei destinatari (busta `DCM2`): il server non può aggiungere qualcuno.
+- Accetta una chiave d'epoca nuova solo se una postazione dell'epoca precedente l'ha firmata
+  (ECDSA P-256): il server non può far adottare una chiave scelta da lui.
 - Ricava la chiave personale da una frase con **Argon2id** e chiude con essa la chiave privata
-  della persona (busta `DCS1`).
+  della persona (busta `DCS2`).
 - Divide la chiave di recupero in 3 parti con **Shamir 2-di-3**; una parte è chiusa per la chiave
   di custodia di DCAM.
 - Cambia epoca quando una persona esce: i dati scritti dopo non si aprono con le chiavi vecchie.
@@ -41,16 +43,16 @@ Il modello di minaccia completo è in [SPEC.md §1](SPEC.md#1-modello-di-minacci
 
 ```bash
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run typecheck
-npm test          # gli stessi test in Node e in Chromium
+npm test          # gli stessi test in Node, Chromium e WebKit
 ```
 
 - `src/*.test.ts` sono i test del codice; quelli che usano `node:crypto` e `node:zlib` come
   **oracolo indipendente** (AES-GCM, HKDF e inflate ricalcolati senza passare dal pacchetto)
   girano solo in Node.
-- `vettori/v1.json` contiene buste prodotte con chiavi note; `vettori/v1.test.ts` le apre in
-  entrambi gli ambienti. Un'altra implementazione del protocollo deve aprirle allo stesso modo.
+- `vettori/v2.json` contiene buste prodotte con chiavi note; `vettori/v2.test.ts` le apre in
+  tutti gli ambienti. Un'altra implementazione del protocollo deve aprirle allo stesso modo.
 - `strumenti/stesso-codice.mjs a.ts b.ts` dice se due file differiscono solo nei commenti: serve a
   confrontare questi sorgenti con quelli inclusi nell'applicazione.
 
@@ -73,12 +75,12 @@ Un solo ingresso per browser e Node (≥ 20.19): il codice usa solo API standard
 (`crypto.subtle`, `crypto.getRandomValues`, `CompressionStream`).
 
 Gli errori del protocollo sono `ErroreRiservata` con un `codice` (`formato`, `apertura`, `elenco`,
-`epoca`, `frase`, `parti`, …): l'applicazione sceglie la frase da mostrare, i test controllano il
+`epoca`, `frase`, `parti`, `firma`, …): l'applicazione sceglie la frase da mostrare, i test controllano il
 codice.
 
 ## Documenti
 
-- [SPEC.md](SPEC.md) — il protocollo v1 (normativo).
+- [SPEC.md](SPEC.md) — il protocollo v2 (normativo).
 - [SECURITY.md](SECURITY.md) — come segnalare un problema.
 - [CHANGELOG.md](CHANGELOG.md).
 
@@ -94,17 +96,18 @@ Apache-2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)). Dipendenze: `@hpke/core` (MIT
 `@dcam/cifratura` is the end-to-end encryption core used by DCAM, a browser-based 2D CAD/CAM.
 Company data is encrypted in the user's browser; the server stores ciphertext it cannot read.
 
-- AES-256-GCM object envelopes (`DCR1`) bound by AAD to organization, kind, object, revision and
+- AES-256-GCM object envelopes (`DCR2`) bound by AAD to organization, kind, object, revision and
   epoch; per-epoch company keys wrapped for each recipient with HPKE (RFC 9180, DHKEM P-256);
-  an authenticated recipient list (`DCM1`); passphrase keys via Argon2id (`DCS1`); recovery key
-  split 2-of-3 with Shamir.
+  an authenticated recipient list (`DCM2`); passphrase keys via Argon2id (`DCS2`); recovery key
+  split 2-of-3 with Shamir. A new epoch key is accepted only if a device of the previous epoch
+  signed it (ECDSA P-256), so the server cannot make devices adopt a key it chose.
 - Only standard primitives from established libraries; no custom cryptography.
 - **Not protected against:** a compromised server serving modified JavaScript (the inherent limit
   of in-browser E2EE — publishing this code is what makes comparison possible), metadata listed in
   SPEC §7, availability/rollback beyond what the browser has already seen.
-- **Status: 0.1.0, not yet externally audited.** 1.0.0 will follow an external review.
+- **Status: 0.2.0, not yet externally audited.** 1.0.0 will follow an external review.
 - Distributed from this repository only, not from npm for now (`"private": true` in `package.json`
   prevents an accidental publish): clone, then `npm ci && npm run build`.
 - The specification ([SPEC.md](SPEC.md)) and identifiers are in Italian; JSON field names are in
-  English. Test vectors in `vettori/v1.json`. Report vulnerabilities as described in
+  English. Test vectors in `vettori/v2.json`. Report vulnerabilities as described in
   [SECURITY.md](SECURITY.md).

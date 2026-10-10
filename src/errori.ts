@@ -7,7 +7,8 @@ export type CodiceErrore =
   | 'epoca'
   | 'frase'
   | 'parti'
-  | 'postazione';
+  | 'postazione'
+  | 'firma';
 
 /** Ogni fallimento del protocollo ha un codice: l'interfaccia decide la frase, i test il codice. */
 export class ErroreRiservata extends Error {

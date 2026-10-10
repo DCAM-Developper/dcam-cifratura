@@ -8,6 +8,7 @@ import {
   leggiBusta,
   comprimi,
   decomprimi,
+  TETTO_DECOMPRESSO,
 } from './formato';
 import { chiaveDati } from './chiavi';
 import { concatena } from './bytes';
@@ -32,11 +33,11 @@ export async function chiudiParte(
   const intest = new Uint8Array(5);
   intest[0] = ALG_AES256GCM;
   new DataView(intest.buffer).setUint32(1, epoch);
-  return scriviBusta('DCR1', intest, nonce, cifrato);
+  return scriviBusta('DCR2', intest, nonce, cifrato);
 }
 
 export function epocaDi(busta: Uint8Array): number {
-  const { intestazione } = leggiBusta('DCR1', busta, 5);
+  const { intestazione } = leggiBusta('DCR2', busta, 5);
   if (intestazione[0] !== ALG_AES256GCM)
     throw new ErroreRiservata('formato', `algoritmo ${intestazione[0]} sconosciuto`);
   return new DataView(intestazione.buffer, intestazione.byteOffset, 5).getUint32(1);
@@ -46,15 +47,16 @@ export async function apriParte(
   chiavePer: (epoch: number) => Uint8Array | undefined,
   ind: Indirizzo,
   parte: Parte,
-  busta: Uint8Array
+  busta: Uint8Array,
+  tetto = TETTO_DECOMPRESSO
 ): Promise<Uint8Array> {
   const epoch = epocaDi(busta);
   const E = chiavePer(epoch);
   if (!E) throw new ErroreRiservata('epoca', `manca la chiave dell'epoca ${epoch}`);
-  const { nonce, cifrato } = leggiBusta('DCR1', busta, 5);
+  const { nonce, cifrato } = leggiBusta('DCR2', busta, 5);
   const pt = await decifraAes(await chiaveDati(E), nonce, cifrato, aadParte(ind, parte, epoch));
   if (pt[0] === 0) return pt.subarray(1);
-  if (pt[0] === 1) return decomprimi(pt.subarray(1));
+  if (pt[0] === 1) return decomprimi(pt.subarray(1), tetto);
   throw new ErroreRiservata('formato', `codec ${pt[0]} sconosciuto`);
 }
 

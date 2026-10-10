@@ -24,7 +24,7 @@ async function elencoDiProva(): Promise<{ el: Elenco; coppie: Record<string, Cry
   return {
     coppie,
     el: {
-      v: 1,
+      v: 2,
       orgId: 'org1',
       epoch: 1,
       seq: 1,

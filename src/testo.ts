@@ -1,6 +1,8 @@
 // src/testo.ts
 // Crockford base32 (https://www.crockford.com/base32.html): niente I, L, O, U; lettura tollerante.
 // È una CODIFICA per stampare e digitare chiavi, non crittografia.
+import { ErroreRiservata } from './errori';
+
 const ALFABETO = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 export function aBase32(b: Uint8Array): string {
@@ -31,7 +33,7 @@ export function daBase32(s: string, byte: number): Uint8Array {
   let o = 0;
   for (const ch of n) {
     const v = ALFABETO.indexOf(ch);
-    if (v < 0) throw new Error(`carattere non valido «${ch}»`);
+    if (v < 0) throw new ErroreRiservata('formato', `carattere non valido «${ch}»`);
     valore = (valore << 5) | v;
     bit += 5;
     if (bit >= 8) {
@@ -39,7 +41,7 @@ export function daBase32(s: string, byte: number): Uint8Array {
       bit -= 8;
     }
   }
-  if (o !== byte) throw new Error(`attesi ${byte} byte, letti ${o}`);
+  if (o !== byte) throw new ErroreRiservata('formato', `attesi ${byte} byte, letti ${o}`);
   return out;
 }
 

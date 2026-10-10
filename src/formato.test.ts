@@ -26,7 +26,7 @@ async function chiave(raw: Uint8Array): Promise<CryptoKey> {
 describe('AAD canonico (protocollo §3.1)', () => {
   test('prefisso, separatori 0x00, numeri in decimale', () => {
     const b = aad('obj', 'org1', 7);
-    expect(Buffer.from(b).toString('latin1')).toBe('dcam.riservata.v1\0obj\0org1\x007');
+    expect(Buffer.from(b).toString('latin1')).toBe('dcam.riservata.v2\0obj\0org1\x007');
   });
   test('un campo con 0x00 è rifiutato', () => {
     expect(() => aad('a\0b')).toThrow(ErroreRiservata);
@@ -37,14 +37,14 @@ describe('AAD canonico (protocollo §3.1)', () => {
   });
 });
 
-describe('sigillo DCS1 (protocollo §3.4)', () => {
+describe('sigillo DCS2 (protocollo §3.4)', () => {
   test('Node crypto lo apre leggendo gli offset della specifica', async () => {
     const raw = crypto.getRandomValues(new Uint8Array(32));
     const k = await chiave(raw);
     const a = aad('person', 'org1', 'u1');
     const pt = new TextEncoder().encode('privata pkcs8 finta');
     const busta = await seal(k, pt, a);
-    expect(Buffer.from(busta.subarray(0, 4)).toString()).toBe('DCS1');
+    expect(Buffer.from(busta.subarray(0, 4)).toString()).toBe('DCS2');
     const nonce = busta.subarray(4, 16);
     const ct = busta.subarray(16, busta.length - 16);
     const tag = busta.subarray(busta.length - 16);
@@ -84,15 +84,15 @@ describe('busta generica', () => {
     const k = await chiave(crypto.getRandomValues(new Uint8Array(32)));
     const { nonce, cifrato } = await cifraAes(k, new Uint8Array([9]), aad('x'));
     const intest = new Uint8Array([1, 0, 0, 0, 5]);
-    const b = scriviBusta('DCR1', intest, nonce, cifrato);
+    const b = scriviBusta('DCR2', intest, nonce, cifrato);
     expect(b.length).toBe(4 + 5 + 12 + 1 + 16);
-    const l = leggiBusta('DCR1', b, 5);
+    const l = leggiBusta('DCR2', b, 5);
     expect(l.intestazione).toEqual(intest);
     expect(l.nonce).toEqual(nonce);
     expect(l.cifrato).toEqual(cifrato);
   });
   test('busta troppo corta → formato', () => {
-    expect(() => leggiBusta('DCR1', new Uint8Array(10), 5)).toThrow(ErroreRiservata);
+    expect(() => leggiBusta('DCR2', new Uint8Array(10), 5)).toThrow(ErroreRiservata);
   });
 });
 

@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     projects: [
       {
-        test: { name: 'node', environment: 'node', include: ['src/**/*.test.ts', 'vettori/**/*.test.ts'] },
+        test: { name: 'node', environment: 'node', include: ['src/**/*.test.ts', 'vettori/**/*.test.ts'], exclude: ['src/**/*.browser.test.ts'] },
       },
       {
         test: {
@@ -20,7 +20,7 @@ export default defineConfig({
             enabled: true,
             provider: 'playwright',
             headless: true,
-            instances: [{ browser: 'chromium' }],
+            instances: [{ browser: 'chromium' }, { browser: 'webkit' }],
           },
         },
       },

@@ -1,0 +1,134 @@
+{
+  "versione": "0.2.0",
+  "nota": "Buste del protocollo v2 prodotte con chiavi fisse. Ogni implementazione deve aprirle.",
+  "aad": {
+    "campi": [
+      "obj",
+      "org-esempio",
+      "part",
+      "obj-1",
+      3,
+      "meta",
+      7
+    ],
+    "hex": "6463616d2e7269736572766174612e7632006f626a006f72672d6573656d70696f0070617274006f626a2d310033006d6574610037"
+  },
+  "chiaveEpoca": "01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3da",
+  "indirizzo": {
+    "orgId": "org-esempio",
+    "kind": "part",
+    "objectId": "obj-1",
+    "rev": 3
+  },
+  "epoca": 7,
+  "DCR2_meta": {
+    "json": {
+      "nome": "flangia",
+      "spessore": 3
+    },
+    "busta": "4443523201000000072167cc1364b6e7ff3604904469d4a2a8faee4a7eb5ac9ccc1ea3f839633d74ac0fd7471ce31c3d188e5650f947890f40d6fd4a85452372b22b61dc6b"
+  },
+  "DCR2_body": {
+    "testo": "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+    "busta": "444352320100000007e9f1b671de0744b287189bd075be854662b6ff04b500fdcde42cc60f33f3452a96ab674d7e056da10f68789791be37778910d5f0"
+  },
+  "DCM2": {
+    "elenco": {
+      "v": 2,
+      "orgId": "org-esempio",
+      "epoch": 7,
+      "seq": 2,
+      "recovery": {
+        "pubKey": "BOXwS77vhzjGu-LBjipRa3Ng8YDQ1fj3Fp4gb8nj9Ufc6bIgoPHGoN8oQi69IwfZ3NfCTG1_t3YAg9wefkl9bRU"
+      },
+      "recipients": [
+        {
+          "kind": "device",
+          "id": "dev-1",
+          "userId": "u-1",
+          "pubKey": "BOXwS77vhzjGu-LBjipRa3Ng8YDQ1fj3Fp4gb8nj9Ufc6bIgoPHGoN8oQi69IwfZ3NfCTG1_t3YAg9wefkl9bRU",
+          "signKey": "BO--51dyjPNK6AEzfJj0y2od4SOo9T63gvzPvh1AD92J_b63SOIpnsS5JuHBNAgGOUoXdolx1mWyjTIz9onVNdw",
+          "addedBy": "u-1",
+          "addedAt": 1700000000000
+        }
+      ]
+    },
+    "busta": "44434d327444eafd262a9e9fbea527f09ca940e0acec9e6deaef61a009977825b126e37c993de718a0d6892fef51b1eed07f314f97a2801b2ab60152ea9c870ca3808f14c5ba89be756ad40d6e88dc167a55c1ebdb8513c8fca9461fde3ecede02f5fa5ecb2388d8ec790d4c37361de09ef20aa4b875bc3991ec5f2d4bb461671017795d27cc3a2983cd93de4be349d4e30c275b466b4aafccff77e67057c6773e4d33bded507caf6e47beeeb5875535ebd14058470f96c9a42199dc10ad2d674df5b3e8b9c1d935e9b86edf59548cd75690a97f0bf5a3c7f436a3196205834faf1b2643297cb63f0f5cc7efca047411ad213f64dece2a3ffd852c4df6971092bc2cbba183a7d87b8a1c24af2084e1ea66c488fa6d730db61ea05b5334fbac370f5220e42d46980e6db1f878ff9d60c7a3a278fd671f5c7b442761796195779b14ae7780db463ab1ded57b417f63273e2400b07c13ae573296600a299c5006367a20cb90bcbff6946730ec9fbbe5ec90976e27680f94796fb11e19582a8a2e90009c1f7dfb8fe947b1df712bf813d073dbda6514b54da06477952d9f59c2c087da4b20e12de333d3c4f356101decf060579c77ba5f47a37a50f0f4fed9a6b9b2d622b2c55a5accbd5799ae2a84147d72441c95ba79519b75e65244048d511a381c99b24095d06e6d2e91a0"
+  },
+  "impegno": {
+    "chiave": "01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3da",
+    "impegno": "705ad28b93f70353b366b2d6471a413328b783d7b771ecd74166458d3371dd34"
+  },
+  "transizione": {
+    "chiaveNuova": "020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4db",
+    "epoch": 8,
+    "prevSeq": 2,
+    "signerId": "dev-1",
+    "sig": "574cb6d0f70bb81b6ee74b7dc6edc87110e7257dafe5deba98cbb076c79e91e9eab23546b94b419d5486ce5e11e4dc131742efb13e663cf74c74c61261c0808b",
+    "firmaPkcs8": "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b02010104202ec5c0e33ed351ec1247159dbbcef4e559d816219c3941017dbc9d7e76fb3754a14403420004efbee757728cf34ae801337c98f4cb6a1de123a8f53eb782fccfbe1d400fdd89fdbeb748e2299ec4b926e1c1340806394a17768971d665b28d3233f689d535dc"
+  },
+  "destinatario": {
+    "pkcs8": "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b02010104203b8d2f82a7ffe69c321f5fe4f859ebbff5c4079a6cc19a9b2cb98f49068995bba14403420004e5f04bbeef8738c6bbe2c18e2a516b7360f180d0d5f8f7169e206fc9e3f547dce9b220a0f1c6a0df28422ebd2307d9dcd7c24c6d7fb7760083dc1e7e497d6d15",
+    "pub": "04e5f04bbeef8738c6bbe2c18e2a516b7360f180d0d5f8f7169e206fc9e3f547dce9b220a0f1c6a0df28422ebd2307d9dcd7c24c6d7fb7760083dc1e7e497d6d15"
+  },
+  "chiusura": {
+    "contesto": {
+      "orgId": "org-esempio",
+      "epoch": 7,
+      "kind": "device",
+      "id": "dev-1"
+    },
+    "chiusa": "040cf8c219628442e594bdb3156f175c2103d6771fe066b49f04e15de065d23f5ffb4186e219c3776fed70e267d702c4c762d742c32bbeb469973c83bc5aa6fc5b97a3aa9f5af29cbc8a77b3c61ca2a9c9156b4df8baf353c0835eaaec440b81d569d1f1092ce676bc00383cf301fe63a2"
+  },
+  "DCS2_persona": {
+    "orgId": "org-esempio",
+    "userId": "u-1",
+    "frase": "una frase lunga di prova",
+    "record": {
+      "pubKey": "BDMhrarKQCdlqCNgsOLGExY-6sTKGgAMDL87eb7GCiovSAYSGZDel_gK4q4sUoX-5CKhM50sdbpeuwtDge3Y-z0",
+      "sealedPriv": "RENTMiy4gaZc3T0oXyVCwzz88ndDKXGmsnReKVlEMc9xYvSs0BvxjqPjUMCFlyW7Emuyxe4YJviVCSfwzzk34eHk-3AxVHWiOVAISa9avp97ZM3Oh_NCnBXGZ-voVbVpbEljKcjV91j-5u85GMwcJ2UPMlSRBKgsFNW9oRXd2DxhIzGcSEk50bO30RxUobc5BzVzQAmqq3lwfzm88nWxbsfHLJsvNTCsNNs",
+      "kdf": {
+        "alg": "argon2id13",
+        "ops": 3,
+        "mem": 67108864,
+        "salt": "CRAXHiUsMzpBSE9WXWRrcg"
+      }
+    }
+  },
+  "recupero": {
+    "orgId": "org-esempio",
+    "R": "31fb206198baf8e24e2a0a1c68bcedb0b88a05ca397cd3e48b1354fd042f32e0",
+    "ancora": "705ad28b93f70353b366b2d6471a413328b783d7b771ecd74166458d3371dd34",
+    "pub": "04d94d82d1a60f2f5cbb1a23e5953610ae852d0300d5c637e71104e518527b1154681e70c1835fd219598a3fd6563e1673324b9dd675a030650c607b148dbd1b66",
+    "sealedPriv": "44435332274f3b3f99b5ce70e206179216f1c04864844de4c8220f7f93ff384c43e0d93999afc9a415c2c3b57dc1b8b2bfb2c2ae7b54669259996193de93ff1f3395961759c46546fe2dfd9082383f87ddebb4ac4e2f394c0b10f892da5d3bbfe23e98a04e7d680fe071d8c397d678fe25c783d656f8e57d09ed578e0c04e5b08f9aad63bc29ba9ed56c508484618ef115c5c13fb31406b68144bd9c4a4e48ae89b2c4b93037b1075138fa9bc314ee844a3631ef2a34e7d30b104e1bebde27049087069650ac71fd0c06",
+    "parti": [
+      "1f0cec6d475dd01099d8eaf48282fd82f939c03cdde542fd6d7a38e8718c358efe",
+      "69da163044ae05b90571078691d1d88cd0b91857f2d1e9fa2386bbb2f5292b6c0a",
+      "dc7929024bbca982df4a7327ced569ba5d0f8d8b6135d8e14ea7029b572e4d2b03"
+    ]
+  },
+  "custodia": {
+    "orgId": "org-esempio",
+    "parteB": "69da163044ae05b90571078691d1d88cd0b91857f2d1e9fa2386bbb2f5292b6c0a",
+    "chiusa": "0494074c0a9ab2fa5417af24de30b95bb315dc014b23d0fdc3145429cb035c69a56c1a6eeee9e97ee8dd0021a3bb247d449510c39a1c1a890d9d109a8f2019e77a88c898ea9a1e106d6b17d50696de42487f4c92f8eee156e956fd86d8a1a4b552b0acb96ad8ee858d0bff63773d34e8dc16"
+  },
+  "DCS2_trasferimento": {
+    "codice": "ABCDEFGHJKMNPQRSTVWX",
+    "transferId": "t-1",
+    "orgId": "org-esempio",
+    "forUserId": "u-2",
+    "pacchetto": {
+      "orgId": "org-esempio",
+      "forUserId": "u-2",
+      "epochs": {
+        "7": "AQgPFh0kKzI5QEdOVVxjanF4f4aNlJuiqbC3vsXM09o"
+      },
+      "manifest": {
+        "epoch": 7,
+        "seq": 2,
+        "blob": "x"
+      }
+    },
+    "busta": "444353325c7cc745dbf84b81e8d1ec1c218f20b5535417206728f00add48a9dcf848d90c70faa46c89941dbdab99341ba2bf371f1c49dee51bff084a4276bf09dd71d104d1757fd70e42057b782d39ff487d7fb194f7d77a4fdeaf756e6a7533916d099c74c189e7319aa51951966adaa807e60e71fca1223e5cd131cb7372be14aa8c49eaf60c767662344cd042c8fae842f670a52308ad2e9fc032a0e9ccf2a5b53f2653d6b4efbe015a1505a525fd"
+  }
+}

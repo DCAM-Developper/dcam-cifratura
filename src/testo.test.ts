@@ -2,6 +2,7 @@
 // src/testo.test.ts
 import { describe, expect, test } from 'vitest';
 import { aBase32, daBase32, aGruppi } from './testo';
+import { ErroreRiservata } from './errori';
 
 describe('Crockford base32', () => {
   test('32 byte → 52 caratteri, ritorno esatto', () => {
@@ -21,8 +22,10 @@ describe('Crockford base32', () => {
     const sporco = aGruppi(s).toLowerCase().replace(/0/g, 'o').replace(/1/g, 'l');
     expect(daBase32(sporco, 32)).toEqual(b);
   });
-  test('carattere estraneo (U) → errore', () => {
-    expect(() => daBase32('U'.repeat(52), 32)).toThrow();
+  test('carattere estraneo (U) o lunghezza sbagliata → ErroreRiservata «formato»', () => {
+    expect(() => daBase32('U'.repeat(52), 32)).toThrow(ErroreRiservata);
+    expect(() => daBase32('U'.repeat(52), 32)).toThrow(expect.objectContaining({ codice: 'formato' }));
+    expect(() => daBase32('0'.repeat(10), 32)).toThrow(expect.objectContaining({ codice: 'formato' }));
   });
   test('gruppi da 4 separati da trattino', () => {
     expect(aGruppi('ABCDEFGHJK')).toBe('ABCD-EFGH-JK');

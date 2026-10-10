@@ -11,11 +11,13 @@ export type Destinatario = {
   userId: string;
   label?: string;
   pubKey: string;
+  /** solo `device`: pubblica ECDSA P-256 con cui la postazione firma le epoche nuove (§3.6) */
+  signKey?: string;
   addedBy: string;
   addedAt: number;
 };
 export type Elenco = {
-  v: 1;
+  v: 2;
   orgId: string;
   epoch: number;
   seq: number;
@@ -31,7 +33,7 @@ export async function chiudiElenco(E: Uint8Array, el: Elenco): Promise<Uint8Arra
     new TextEncoder().encode(JSON.stringify(el)),
     aadElenco(el.orgId, el.epoch, el.seq)
   );
-  return scriviBusta('DCM1', new Uint8Array(0), nonce, cifrato);
+  return scriviBusta('DCM2', new Uint8Array(0), nonce, cifrato);
 }
 
 export async function apriElenco(
@@ -39,7 +41,7 @@ export async function apriElenco(
   busta: Uint8Array,
   atteso: { orgId: string; epoch: number; seq: number }
 ): Promise<Elenco> {
-  const { nonce, cifrato } = leggiBusta('DCM1', busta, 0);
+  const { nonce, cifrato } = leggiBusta('DCM2', busta, 0);
   const pt = await decifraAes(
     await chiaveElenco(E),
     nonce,
@@ -48,7 +50,7 @@ export async function apriElenco(
   );
   const el = JSON.parse(new TextDecoder().decode(pt)) as Elenco;
   if (
-    el.v !== 1 ||
+    el.v !== 2 ||
     el.orgId !== atteso.orgId ||
     el.epoch !== atteso.epoch ||
     el.seq !== atteso.seq

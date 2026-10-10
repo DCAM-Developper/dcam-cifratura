@@ -1,10 +1,10 @@
 // src/formato.ts
-// Formati del protocollo v1 — protocollo §3 (SPEC.md).
+// Formati del protocollo v2 — protocollo §3 (SPEC.md).
 import { ab, concatena, casuali } from './bytes';
 import { ErroreRiservata } from './errori';
 
-export const PREFISSO_AAD = 'dcam.riservata.v1';
-export type Magic = 'DCR1' | 'DCS1' | 'DCM1';
+export const PREFISSO_AAD = 'dcam.riservata.v2';
+export type Magic = 'DCR2' | 'DCS2' | 'DCM2';
 const NONCE = 12;
 const TAG = 16;
 const enc = new TextEncoder();
@@ -86,7 +86,7 @@ export async function decifraAes(
 
 export async function seal(k: CryptoKey, pt: Uint8Array, aadB: Uint8Array): Promise<Uint8Array> {
   const { nonce, cifrato } = await cifraAes(k, pt, aadB);
-  return scriviBusta('DCS1', new Uint8Array(0), nonce, cifrato);
+  return scriviBusta('DCS2', new Uint8Array(0), nonce, cifrato);
 }
 
 export async function unseal(
@@ -94,16 +94,33 @@ export async function unseal(
   busta: Uint8Array,
   aadB: Uint8Array
 ): Promise<Uint8Array> {
-  const { nonce, cifrato } = leggiBusta('DCS1', busta, 0);
+  const { nonce, cifrato } = leggiBusta('DCS2', busta, 0);
   return decifraAes(k, nonce, cifrato, aadB);
 }
 
 async function attraverso(
   b: Uint8Array,
-  t: CompressionStream | DecompressionStream
+  t: CompressionStream | DecompressionStream,
+  tetto = Infinity
 ): Promise<Uint8Array> {
-  const out = await new Response(new Blob([ab(b)]).stream().pipeThrough(t)).arrayBuffer();
-  return new Uint8Array(out);
+  const lettore = new Blob([ab(b)]).stream().pipeThrough(t).getReader();
+  const pezzi: Uint8Array[] = [];
+  let n = 0;
+  for (;;) {
+    const { done, value } = await lettore.read();
+    if (done) break;
+    n += value.length;
+    if (n > tetto) {
+      await lettore.cancel();
+      throw new ErroreRiservata('formato', `contenuto decompresso oltre ${tetto} byte`);
+    }
+    pezzi.push(value);
+  }
+  return concatena(...pezzi);
 }
+
+/** Tetto all'uscita di `decomprimi` (protocollo §3.2): 256 MiB. */
+export const TETTO_DECOMPRESSO = 256 * 1024 * 1024;
 export const comprimi = (b: Uint8Array) => attraverso(b, new CompressionStream('deflate'));
-export const decomprimi = (b: Uint8Array) => attraverso(b, new DecompressionStream('deflate'));
+export const decomprimi = (b: Uint8Array, tetto = TETTO_DECOMPRESSO) =>
+  attraverso(b, new DecompressionStream('deflate'), tetto);

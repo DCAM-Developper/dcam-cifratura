@@ -5,11 +5,11 @@ import { createDecipheriv, hkdfSync } from 'node:crypto';
 import { inflateSync } from 'node:zlib';
 import { chiudiParte, apriParte, epocaDi, chiudiJson, apriJson } from './oggetto';
 import { generaChiaveEpoca } from './chiavi';
-import { aad } from './formato';
+import { aad, TETTO_DECOMPRESSO } from './formato';
 
 const ind = { orgId: 'org1', kind: 'part', objectId: 'p1', rev: 3 };
 
-describe('busta DCR1 di una parte (protocollo §3.2)', () => {
+describe('busta DCR2 di una parte (protocollo §3.2)', () => {
   test('Node crypto la apre agli offset della specifica, con DK = HKDF(E, "…data")', async () => {
     const E = generaChiaveEpoca();
     const busta = await chiudiParte(
@@ -19,10 +19,10 @@ describe('busta DCR1 di una parte (protocollo §3.2)', () => {
       'body',
       new TextEncoder().encode('<svg/>'.repeat(100))
     );
-    expect(Buffer.from(busta.subarray(0, 4)).toString()).toBe('DCR1');
+    expect(Buffer.from(busta.subarray(0, 4)).toString()).toBe('DCR2');
     expect(busta[4]).toBe(1);
     expect(Buffer.from(busta).readUInt32BE(5)).toBe(7);
-    const dk = Buffer.from(hkdfSync('sha256', E, Buffer.alloc(0), 'dcam.riservata.v1.data', 32));
+    const dk = Buffer.from(hkdfSync('sha256', E, Buffer.alloc(0), 'dcam.riservata.v2.data', 32));
     const d = createDecipheriv('aes-256-gcm', dk, busta.subarray(9, 21));
     d.setAAD(aad('obj', 'org1', 'part', 'p1', 3, 'body', 7));
     d.setAuthTag(busta.subarray(busta.length - 16));
@@ -73,4 +73,22 @@ describe('busta DCR1 di una parte (protocollo §3.2)', () => {
     const b = await chiudiJson(E, 1, ind, 'meta', meta);
     expect(await apriJson(() => E, ind, 'meta', b)).toEqual(meta);
   });
+});
+
+describe('bomba di decompressione (protocollo §3.2)', () => {
+  test('oltre il tetto → formato; al tetto esatto passa', async () => {
+    const E = generaChiaveEpoca();
+    const b = await chiudiParte(E, 1, ind, 'body', new Uint8Array(1_000_000));
+    await expect(apriParte(() => E, ind, 'body', b, 999_999)).rejects.toMatchObject({
+      codice: 'formato',
+    });
+    expect((await apriParte(() => E, ind, 'body', b, 1_000_000)).length).toBe(1_000_000);
+  });
+  test('tetto di fabbrica 256 MiB: 257 MiB di zeri (busta di pochi KB) si fermano', async () => {
+    expect(TETTO_DECOMPRESSO).toBe(256 * 1024 * 1024);
+    const E = generaChiaveEpoca();
+    const b = await chiudiParte(E, 1, ind, 'body', new Uint8Array(257 * 1024 * 1024));
+    expect(b.length).toBeLessThan(1024 * 1024);
+    await expect(apriParte(() => E, ind, 'body', b)).rejects.toMatchObject({ codice: 'formato' });
+  }, 60_000);
 });
