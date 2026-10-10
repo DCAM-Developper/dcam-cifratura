@@ -256,4 +256,45 @@ describe('epoche firmate', () => {
       await codice(verificaChiavi(orgId, chiavi, new Map([[1, await impegno(a.E1)]]), [t]))
     ).toBe('firma');
   });
+
+  test('postazione RIMOSSA nell’elenco n (seq 3) non firma n+1 su una seq vecchia, per chi ha visto la seq 3', async () => {
+    const a = await azienda();
+    const altra = await generaCoppiaFirma(false);
+    const dev2 = await generaCoppia(false);
+    // seq 2: entra d2; seq 3: d1 tolta (lo scrive un destinatario con E1)
+    const el2: Elenco = {
+      ...a.el1,
+      seq: 2,
+      recipients: [
+        ...a.el1.recipients,
+        {
+          kind: 'device',
+          id: 'd2',
+          userId: 'u2',
+          pubKey: a64(await pubblicaRaw(dev2.publicKey)),
+          signKey: a64(await pubblicaRaw(altra.publicKey)),
+          addedBy: 'u2',
+          addedAt: 2,
+        },
+      ],
+    };
+    const blob2 = await chiudiElenco(a.E1, el2);
+    const E2 = generaChiaveEpoca();
+    // d1 firma sulla seq 2 (dove c'è ancora) mentre la postazione ha già visto la seq 3
+    const t = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd1', a.firma.privateKey);
+    const chiavi = new Map([
+      [1, a.E1],
+      [2, E2],
+    ]);
+    const fidati = new Map([[1, await impegno(a.E1)]]);
+    expect(
+      await codice(verificaChiavi(orgId, chiavi, fidati, [t], { epoch: 1, seq: 3 }))
+    ).toBe('firma');
+    // sull'ultima seq vista, o senza memoria, la firma della postazione presente passa
+    const t3 = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd2', altra.privateKey);
+    await expect(
+      verificaChiavi(orgId, chiavi, fidati, [t3], { epoch: 1, seq: 2 })
+    ).resolves.toBeDefined();
+    await expect(verificaChiavi(orgId, chiavi, fidati, [t])).resolves.toBeDefined();
+  });
 });

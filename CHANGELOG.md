@@ -13,7 +13,8 @@ produzione). Vettori nuovi in `vettori/v2.json`.
   loro impegno. L'ancora viene dalla postazione che attiva, dal pacchetto chiuso col codice di
   trasferimento o da dentro la privata di recupero. Nuove funzioni `impegno`,
   `generaCoppiaFirma`, `firmaTransizione`, `verificaTransizione`, `verificaChiavi`; nuovo codice
-  d'errore `firma`.
+  d'errore `firma`. `verificaChiavi(…, visto)` rifiuta una transizione firmata su una seq
+  dell'elenco più vecchia di quella già vista.
 - `creaRecupero(orgId, ancora)` / `apriRecupero` → `{ coppia, ancora }`; l'AAD lega la pubblica di RP.
 - Custodia: l'info HPKE lega la pubblica di RP (una parte B di un kit vecchio non passa per quella
   del nuovo); `apriPerCustodia` controlla la lunghezza (114 byte) e dà `ErroreRiservata`.

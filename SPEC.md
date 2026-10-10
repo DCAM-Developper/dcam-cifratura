@@ -82,6 +82,10 @@ I rimandi «protocollo §x» nei commenti del codice si riferiscono alle sezioni
   (una biforcazione) e farla adottare alle postazioni che non hanno ancora caricato l'epoca *n+1*
   vera. Una postazione che ha già accettato un'epoca ne ricorda l'impegno e rifiuta l'altra; il
   rischio dura dal rinnovo al primo caricamento di ogni postazione;
+- **una postazione tolta dall'elenco dentro un'epoca, con il server complice**, verso una
+  postazione che non ha ancora visto la seq che l'ha tolta (per esempio una appena recuperata):
+  il server può consegnarle la firma fatta su una seq vecchia. Una postazione che ha già visto
+  la seq nuova la rifiuta (§3.6);
 - **il recupero è nella fiducia di chi ha le parti.** Chi ricompone `R` (il kit, o due parti su
   tre) apre tutte le epoche e può entrare come una persona nuova. L'ancora del recupero (§3.6) è
   quella scritta dentro la privata di RP: se `R` è nelle mani sbagliate, il protocollo non lo vede.
@@ -262,7 +266,11 @@ Chi verifica la transizione `n+1`, avendo già accettato `E_n`:
 chiave deve dare lo stesso (vale anche per le epoche **vecchie**: altrimenti il server, chiudendo
 una chiave sua per un'epoca passata, farebbe aprire oggetti falsi); se è nuova, deve avere la
 precedente accettata e una transizione che si verifica. Senza nessun impegno di partenza non si
-accetta niente.
+accetta niente. Se la postazione ha già aperto l'elenco dell'epoca *n* alla seq *s*, una
+transizione `n+1` firmata su una seq minore di *s* si rifiuta (errore `firma`): dentro un'epoca
+una postazione può uscire dall'elenco solo con una seq nuova, e non deve poter firmare su una seq
+vecchia in cui c'era ancora. Chi applica il protocollo lato server accetta la firma solo sull'ultima
+seq dell'epoca corrente.
 
 **L'ancora** (il primo impegno accettato) non viene mai dal server:
 

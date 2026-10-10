@@ -121,12 +121,17 @@ const uguali = (a: Uint8Array, b: Uint8Array) =>
  * VECCHIE: altrimenti il server inietterebbe oggetti in un'epoca passata); ogni epoca nuova deve
  * avere la precedente verificata e una transizione firmata. Restituisce una mappa NUOVA con gli
  * impegni verificati; `fidati` non si modifica.
+ * `visto` = l'elenco più recente che questa postazione ha già aperto: una transizione dall'epoca
+ * `visto.epoch` deve essere firmata su quella seq o una successiva. Dentro un'epoca l'elenco può
+ * perdere una postazione solo con una seq nuova: senza questo controllo quella postazione
+ * firmerebbe su una seq vecchia in cui c'era ancora.
  */
 export async function verificaChiavi(
   orgId: string,
   chiavi: Map<number, Uint8Array>,
   fidati: Map<number, Uint8Array>,
-  transizioni: Transizione[]
+  transizioni: Transizione[],
+  visto?: { epoch: number; seq: number }
 ): Promise<Map<number, Uint8Array>> {
   const out = new Map(fidati);
   const perEpoca = new Map(transizioni.map(t => [t.epoch, t]));
@@ -142,6 +147,9 @@ export async function verificaChiavi(
     const prec = chiavi.get(e - 1);
     const t = perEpoca.get(e);
     if (!prec || !t) throw rifiuta(`l'epoca ${e} non si lega alla precedente`);
+    if (visto && visto.epoch === e - 1 && t.prevSeq < visto.seq) {
+      throw rifiuta(`l'epoca ${e} è firmata su un elenco più vecchio di quello già visto`);
+    }
     await verificaTransizione(orgId, prec, E, t);
     out.set(e, c);
   }
