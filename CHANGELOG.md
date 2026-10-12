@@ -8,9 +8,11 @@ epoche e la sua API. Viene da una revisione indipendente della 0.2.0.
 - **Chi rinnova non adotta la biforcazione della tolta (SPEC §3.6, §4.5).** Con la 0.2.0 una
   postazione tolta, insieme al server, firmava un'epoca *n+1* sua (era nell'elenco *n*) e la faceva
   adottare a tutti, anche a chi aveva appena rinnovato: la revoca si aggirava. Ora chi rinnova fissa
-  prima di inviare i **firmatari** possibili di *n+1* e, alla risposta, ne salva l'impegno.
+  prima di inviare i **firmatari** possibili di *n+1* (coppie id → `signKey`: un id noto con una
+  chiave diversa non passa) e, alla risposta, ne salva l'impegno.
 - **API:** `verificaChiavi(orgId, chiavi, fidati, transizioni, memoria?)` con
   `memoria = { visto?, firmatari? }` (prima il quinto argomento era `visto`). Nuovo tipo `Memoria`.
+  `verificaTransizione` restituisce la `signKey` con cui la firma si è verificata (prima `void`).
 - **SPEC §1:** i limiti della catena con il server complice in una tabella (L1-L6): firmare vale
   quanto conoscere `E_n`; il controllo della seq vista protegge un caso che DCAM non produce; il
   recupero su un browser nuovo parte solo da C_1; la revoca dichiarata dal server; un rinnovo

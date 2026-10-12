@@ -282,10 +282,12 @@ quando il browser ha già usato l'azienda:
   transizione `n+1` firmata su una seq minore di *s* si rifiuta (errore `firma`). Ferma una
   postazione tolta dentro un'epoca che firma su una seq vecchia; NON ferma chi conosce `E_n`, che
   scrive un elenco a una seq più alta (§1, L1-L2);
-- **firmatari fissati** (`firmatari`: epoca → id delle postazioni): chi rinnova *n → n+1* fissa,
-  PRIMA di inviare, le postazioni con `signKey` dell'elenco *n+1* che ha costruito (quelle
-  dell'elenco *n* da cui parte meno quelle che toglie). Una `n+1` firmata da un'altra postazione —
-  la tolta, o una coniata in un elenco *n* da chi conosce `E_n` — si rifiuta (errore `firma`). Vale
+- **firmatari fissati** (`firmatari`: epoca → coppie id della postazione → `signKey`): chi rinnova
+  *n → n+1* fissa, PRIMA di inviare, le postazioni con `signKey` dell'elenco *n+1* che ha costruito
+  (quelle dell'elenco *n* da cui parte meno quelle che toglie). Conta la coppia, non l'id: chi
+  conosce `E_n` può scrivere un elenco *n* con l'id di una postazione rimasta e una `signKey` sua.
+  Una `n+1` firmata da un'altra postazione — la tolta, una coniata, o un id noto con una chiave
+  diversa — si rifiuta (errore `firma`). Vale
   anche se la risposta del server si perde, o se il server risponde «un altro ha rinnovato» (409):
   la *n+1* vera di un altro amministratore, firmata da una postazione rimasta, passa;
 - **impegno di chi rinnova**: dopo la risposta positiva del server, chi ha rinnovato salva

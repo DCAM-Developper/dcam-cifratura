@@ -94,7 +94,7 @@ describe('vettori v2', () => {
   test('transizione firmata: si verifica; con un\'altra chiave nuova no', async () => {
     const t = v.transizione;
     const tr = { epoch: t.epoch, prevSeq: t.prevSeq, prevBlob: h(v.DCM2.busta), signerId: t.signerId, sig: h(t.sig) };
-    await expect(verificaTransizione(v.indirizzo.orgId, E, h(t.chiaveNuova), tr)).resolves.toBeUndefined();
+    await expect(verificaTransizione(v.indirizzo.orgId, E, h(t.chiaveNuova), tr)).resolves.toBe(v.DCM2.elenco.recipients[0].signKey);
     await expect(verificaTransizione(v.indirizzo.orgId, E, E, tr)).rejects.toMatchObject({ codice: 'firma' });
   });
 });

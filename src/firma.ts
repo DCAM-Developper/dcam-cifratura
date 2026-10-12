@@ -83,13 +83,14 @@ const rifiuta = (perche: string) => new ErroreRiservata('firma', perche);
  * Verifica che `Enuova` sia la chiave dell'epoca `t.epoch` firmata da una postazione dell'elenco
  * precedente, aperto con `Eprec` (che chi chiama ha già verificato). Errori: `apertura`/`elenco`
  * se l'elenco precedente non è autentico, `firma` se il firmatario o la firma non tornano.
+ * Restituisce la `signKey` (base64url) con cui la firma si è verificata.
  */
 export async function verificaTransizione(
   orgId: string,
   Eprec: Uint8Array,
   Enuova: Uint8Array,
   t: Transizione
-): Promise<void> {
+): Promise<string> {
   const el = await apriElenco(Eprec, t.prevBlob, {
     orgId,
     epoch: t.epoch - 1,
@@ -113,6 +114,7 @@ export async function verificaTransizione(
   if (!(await crypto.subtle.verify(ALG_FIRMA, pub, ab(t.sig), ab(m)))) {
     throw rifiuta(`la chiave dell'epoca ${t.epoch} non è firmata da una postazione dell'azienda`);
   }
+  return chi.signKey;
 }
 
 const uguali = (a: Uint8Array, b: Uint8Array) =>
@@ -128,11 +130,13 @@ export type Memoria = {
    */
   visto?: { epoch: number; seq: number };
   /**
-   * Epoca → id delle postazioni che possono firmarla: chi rinnova n → n+1 le fissa PRIMA di
-   * inviare (le postazioni con `signKey` dell'elenco n da cui parte, meno quelle che toglie).
-   * Una n+1 firmata da un'altra (la tolta, o una postazione coniata con E_n) si rifiuta.
+   * Epoca → (id della postazione → `signKey`) di chi può firmarla: chi rinnova n → n+1 le fissa
+   * PRIMA di inviare (le postazioni con `signKey` dell'elenco n da cui parte, meno quelle che
+   * toglie). Conta la COPPIA: chi conosce E_n può scrivere un elenco n con un id noto e una
+   * `signKey` sua. Una n+1 firmata da un'altra (la tolta, una postazione coniata, o un id noto
+   * con una chiave diversa) si rifiuta.
    */
-  firmatari?: Map<number, readonly string[]>;
+  firmatari?: Map<number, ReadonlyMap<string, string>>;
 };
 
 /**
@@ -169,11 +173,11 @@ export async function verificaChiavi(
     if (visto && visto.epoch === e - 1 && t.prevSeq < visto.seq) {
       throw rifiuta(`l'epoca ${e} è firmata su un elenco più vecchio di quello già visto`);
     }
+    const signKey = await verificaTransizione(orgId, prec, E, t);
     const possibili = firmatari?.get(e);
-    if (possibili && !possibili.includes(t.signerId)) {
+    if (possibili && possibili.get(t.signerId) !== signKey) {
       throw rifiuta(`l'epoca ${e} è firmata da ${t.signerId}, non da chi l'ha rinnovata`);
     }
-    await verificaTransizione(orgId, prec, E, t);
     out.set(e, c);
   }
   return out;

@@ -64,7 +64,9 @@ describe('epoche firmate', () => {
     const a = await azienda();
     const E2 = generaChiaveEpoca();
     const t = await firmaTransizione(orgId, E2, 2, 1, a.blob1, 'd1', a.firma.privateKey);
-    await expect(verificaTransizione(orgId, a.E1, E2, t)).resolves.toBeUndefined();
+    await expect(verificaTransizione(orgId, a.E1, E2, t)).resolves.toBe(
+      a.el1.recipients[0].signKey
+    );
     const fidati = await verificaChiavi(
       orgId,
       new Map([
@@ -315,8 +317,8 @@ describe('epoche firmate', () => {
       recipients: [...a.el1.recipients, await voce('d2', f2.publicKey, dev2.publicKey)],
     };
     const blob2 = await chiudiElenco(a.E1, el2);
-    // d2 rinnova togliendo d1: fissa i firmatari possibili di n+1 = {d2}
-    const firmatari = new Map([[2, ['d2']]]);
+    // d2 rinnova togliendo d1: fissa i firmatari possibili di n+1 = {d2 con la SUA signKey}
+    const firmatari = new Map([[2, new Map([['d2', a64(await pubblicaRaw(f2.publicKey))]])]]);
     const fidati = new Map([[1, await impegno(a.E1)]]);
     const E2 = generaChiaveEpoca();
     const chiavi = new Map([
@@ -351,8 +353,20 @@ describe('epoche firmate', () => {
     expect(await codice(verificaChiavi(orgId, chiavi, fidati, [coniata], { firmatari }))).toBe(
       'firma'
     );
+    // chi conosce E_1 riscrive la voce d2 con una signKey sua (stesso id) e firma «come d2»
+    const el4: Elenco = {
+      ...el2,
+      seq: 4,
+      recipients: [a.el1.recipients[0], await voce('d2', fx.publicKey, dev2.publicKey)],
+    };
+    const blob4 = await chiudiElenco(a.E1, el4);
+    const travestita = await firmaTransizione(orgId, E2, 2, 4, blob4, 'd2', fx.privateKey);
+    await expect(verificaChiavi(orgId, chiavi, fidati, [travestita])).resolves.toBeDefined();
+    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [travestita], { firmatari }))).toBe(
+      'firma'
+    );
     // un'epoca senza firmatari fissati non è toccata
-    const altri = new Map([[3, ['d2']]]);
+    const altri = new Map([[3, new Map([['d2', 'x']])]]);
     await expect(
       verificaChiavi(orgId, chiavi, fidati, [tolta], { firmatari: altri })
     ).resolves.toBeDefined();
