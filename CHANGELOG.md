@@ -17,6 +17,8 @@ epoche e la sua API. Viene da una revisione indipendente della 0.2.0.
   quanto conoscere `E_n`; il controllo della seq vista protegge un caso che DCAM non produce; il
   recupero su un browser nuovo parte solo da C_1; la revoca dichiarata dal server; un rinnovo
   concorrente di una postazione appena entrata; malleabilità ECDSA.
+- **SPEC §1, invariante:** la memoria della postazione cresce e basta, solo l'attivazione la
+  azzera; ogni aggiornamento in un'unica transazione (due schede dello stesso browser).
 - **SPEC §3.6, §5.1:** la memoria della postazione (seq vista, firmatari, impegni) vale su tutte le
   strade, compreso il recupero 3-4 su un browser che ha già usato l'azienda.
 

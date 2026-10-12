@@ -94,6 +94,13 @@ che cosa diffidare. Ogni riga dice chi è esposto e chi no.
 Il protocollo protegge dal server, non da chi è dentro l'azienda: un destinatario attuale conosce
 già le chiavi che una biforcazione gli darebbe.
 
+**Invariante della memoria della postazione** (seq vista, impegni, firmatari; §3.6, §6.4): **cresce
+e basta; solo l'attivazione la azzera.** La seq vista non scende, un impegno salvato non si
+sostituisce, impegni e firmatari si aggiungono; ogni aggiornamento legge e riscrive in un'unica
+transazione, perché due schede dello stesso browser (per esempio il CAD e il nesting) aggiornano
+la stessa memoria insieme. Una memoria che perde una voce riapre in silenzio i casi L1-L3. Una
+azienda (ri)attivata riparte da una `E_1` nuova: lì, e solo lì, la memoria vecchia si cancella.
+
 ## 2. Chiavi
 
 | Nome | Tipo | Dove nasce | Dove vive | Chi la può aprire |
