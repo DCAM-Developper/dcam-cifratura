@@ -5,7 +5,7 @@ disegni, i pezzi e i nesting di un'azienda, in modo che il server li conservi se
 
 *English summary below.*
 
-> **Stato: 0.2.0, non ancora revisionato da terzi.** Il codice è quello in uso in DCAM. Una
+> **Stato: 0.3.0, non ancora revisionato da terzi.** Il codice è quello in uso in DCAM. Una
 > revisione di sicurezza esterna è prevista; fino ad allora nessuna affermazione di
 > «certificazione» o «verifica indipendente» vale per questo pacchetto.
 
@@ -105,7 +105,7 @@ Company data is encrypted in the user's browser; the server stores ciphertext it
 - **Not protected against:** a compromised server serving modified JavaScript (the inherent limit
   of in-browser E2EE — publishing this code is what makes comparison possible), metadata listed in
   SPEC §7, availability/rollback beyond what the browser has already seen.
-- **Status: 0.2.0, not yet externally audited.** 1.0.0 will follow an external review.
+- **Status: 0.3.0, not yet externally audited.** 1.0.0 will follow an external review.
 - Distributed from this repository only, not from npm for now (`"private": true` in `package.json`
   prevents an accidental publish): clone, then `npm ci && npm run build`.
 - The specification ([SPEC.md](SPEC.md)) and identifiers are in Italian; JSON field names are in

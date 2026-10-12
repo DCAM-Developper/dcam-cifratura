@@ -1,6 +1,6 @@
 {
   "name": "@dcam/cifratura",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "End-to-end encryption core of DCAM: envelopes DCR2/DCS2/DCM2, key hierarchy, passphrase (Argon2id), recovery (Shamir), authenticated recipient list, signed epoch transitions.",
   "license": "Apache-2.0",

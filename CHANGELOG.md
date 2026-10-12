@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0 — 2026-10
+
+Protocollo **v2** invariato nei formati (stessi vettori `vettori/v2.json`); cambia la verifica delle
+epoche e la sua API. Viene da una revisione indipendente della 0.2.0.
+
+- **Chi rinnova non adotta la biforcazione della tolta (SPEC §3.6, §4.5).** Con la 0.2.0 una
+  postazione tolta, insieme al server, firmava un'epoca *n+1* sua (era nell'elenco *n*) e la faceva
+  adottare a tutti, anche a chi aveva appena rinnovato: la revoca si aggirava. Ora chi rinnova fissa
+  prima di inviare i **firmatari** possibili di *n+1* e, alla risposta, ne salva l'impegno.
+- **API:** `verificaChiavi(orgId, chiavi, fidati, transizioni, memoria?)` con
+  `memoria = { visto?, firmatari? }` (prima il quinto argomento era `visto`). Nuovo tipo `Memoria`.
+- **SPEC §1:** i limiti della catena con il server complice in una tabella (L1-L6): firmare vale
+  quanto conoscere `E_n`; il controllo della seq vista protegge un caso che DCAM non produce; il
+  recupero su un browser nuovo parte solo da C_1; la revoca dichiarata dal server; un rinnovo
+  concorrente di una postazione appena entrata; malleabilità ECDSA.
+- **SPEC §3.6, §5.1:** la memoria della postazione (seq vista, firmatari, impegni) vale su tutte le
+  strade, compreso il recupero 3-4 su un browser che ha già usato l'azienda.
+
 ## 0.2.0 — 2026-10
 
 Protocollo **v2**. Non apre le buste v1 (la 0.1.0 non è mai stata pubblicata; nessun dato v1 in

@@ -279,14 +279,82 @@ describe('epoche firmate', () => {
       [2, E2],
     ]);
     const fidati = new Map([[1, await impegno(a.E1)]]);
-    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [t], { epoch: 1, seq: 3 }))).toBe(
-      'firma'
-    );
+    expect(
+      await codice(
+        verificaChiavi(orgId, chiavi, fidati, [t], {
+          visto: { epoch: 1, seq: 3 },
+        })
+      )
+    ).toBe('firma');
     // sull'ultima seq vista, o senza memoria, la firma della postazione presente passa
     const t3 = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd2', altra.privateKey);
     await expect(
-      verificaChiavi(orgId, chiavi, fidati, [t3], { epoch: 1, seq: 2 })
+      verificaChiavi(orgId, chiavi, fidati, [t3], {
+        visto: { epoch: 1, seq: 2 },
+      })
     ).resolves.toBeDefined();
     await expect(verificaChiavi(orgId, chiavi, fidati, [t])).resolves.toBeDefined();
+  });
+  test('firmatari: chi rinnova fissa chi può firmare n+1 — la tolta e una postazione CONIATA con E_n no, una rimasta sì', async () => {
+    const a = await azienda();
+    const f2 = await generaCoppiaFirma(false);
+    const dev2 = await generaCoppia(false);
+    const voce = (id: string, sign: CryptoKey, pub: CryptoKey) =>
+      Promise.all([pubblicaRaw(pub), pubblicaRaw(sign)]).then(([p, k]) => ({
+        kind: 'device' as const,
+        id,
+        userId: 'u-' + id,
+        pubKey: a64(p),
+        signKey: a64(k),
+        addedBy: 'u1',
+        addedAt: 2,
+      }));
+    const el2: Elenco = {
+      ...a.el1,
+      seq: 2,
+      recipients: [...a.el1.recipients, await voce('d2', f2.publicKey, dev2.publicKey)],
+    };
+    const blob2 = await chiudiElenco(a.E1, el2);
+    // d2 rinnova togliendo d1: fissa i firmatari possibili di n+1 = {d2}
+    const firmatari = new Map([[2, ['d2']]]);
+    const fidati = new Map([[1, await impegno(a.E1)]]);
+    const E2 = generaChiaveEpoca();
+    const chiavi = new Map([
+      [1, a.E1],
+      [2, E2],
+    ]);
+    const vero = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd2', f2.privateKey);
+    await expect(
+      verificaChiavi(orgId, chiavi, fidati, [vero], { firmatari })
+    ).resolves.toBeDefined();
+    // la tolta (d1, ancora nell'elenco 1) firma una n+1 sua: senza firmatari passa, con no
+    const tolta = await firmaTransizione(orgId, E2, 2, 2, blob2, 'd1', a.firma.privateKey);
+    await expect(verificaChiavi(orgId, chiavi, fidati, [tolta])).resolves.toBeDefined();
+    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [tolta], { firmatari }))).toBe(
+      'firma'
+    );
+    // chi conosce E_1 scrive un elenco 1 seq 3 con una postazione sua e firma con lei
+    const fx = await generaCoppiaFirma(false);
+    const devx = await generaCoppia(false);
+    const el3: Elenco = {
+      ...el2,
+      seq: 3,
+      recipients: [...el2.recipients, await voce('dx', fx.publicKey, devx.publicKey)],
+    };
+    const blob3 = await chiudiElenco(a.E1, el3);
+    const coniata = await firmaTransizione(orgId, E2, 2, 3, blob3, 'dx', fx.privateKey);
+    await expect(
+      verificaChiavi(orgId, chiavi, fidati, [coniata], {
+        visto: { epoch: 1, seq: 2 },
+      })
+    ).resolves.toBeDefined();
+    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [coniata], { firmatari }))).toBe(
+      'firma'
+    );
+    // un'epoca senza firmatari fissati non è toccata
+    const altri = new Map([[3, ['d2']]]);
+    await expect(
+      verificaChiavi(orgId, chiavi, fidati, [tolta], { firmatari: altri })
+    ).resolves.toBeDefined();
   });
 });

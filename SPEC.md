@@ -74,21 +74,25 @@ I rimandi «protocollo §x» nei commenti del codice si riferiscono alle sezioni
 - **la postazione sbloccata:** chi siede a una postazione autorizzata con la sessione aperta
   legge come il titolare della postazione;
 - **i metadati** della §7 e le **dimensioni** dei testi cifrati (nessun riempimento in v2);
-- **un destinatario.** Chiunque abbia `E_n` può scrivere un elenco valido dell'epoca *n*, e
-  chiunque abbia una postazione nell'elenco *n* può firmare un'epoca *n+1*. Il protocollo protegge
-  dal server, non da chi è dentro l'azienda;
-- **una persona uscita da poco, con il server complice.** Una postazione della persona uscita era
-  nell'elenco *n*: insieme al server può firmare un'epoca *n+1* diversa da quella del rinnovo vero
-  (una biforcazione) e farla adottare alle postazioni che non hanno ancora caricato l'epoca *n+1*
-  vera. Una postazione che ha già accettato un'epoca ne ricorda l'impegno e rifiuta l'altra; il
-  rischio dura dal rinnovo al primo caricamento di ogni postazione;
-- **una postazione tolta dall'elenco dentro un'epoca, con il server complice**, verso una
-  postazione che non ha ancora visto la seq che l'ha tolta (per esempio una appena recuperata):
-  il server può consegnarle la firma fatta su una seq vecchia. Una postazione che ha già visto
-  la seq nuova la rifiuta (§3.6);
 - **il recupero è nella fiducia di chi ha le parti.** Chi ricompone `R` (il kit, o due parti su
   tre) apre tutte le epoche e può entrare come una persona nuova. L'ancora del recupero (§3.6) è
   quella scritta dentro la privata di RP: se `R` è nelle mani sbagliate, il protocollo non lo vede.
+
+**Limiti della catena delle epoche (§3.6), con il server complice.** Il server da solo non fa
+adottare una chiave sua; con l'aiuto di chi conosce una `E_n` sì, verso chi non ha in memoria di
+che cosa diffidare. Ogni riga dice chi è esposto e chi no.
+
+| # | Chi, con il server | Che cosa ottiene | Chi lo rifiuta | Chi resta esposto |
+|---|---|---|---|---|
+| L1 | **chiunque conosca `E_n`** (un destinatario attuale o tolto dall'epoca *n*) | firmare un'epoca *n+1*: firmare vale quanto conoscere `E_n`, perché scrive un elenco *n* a una seq più alta con dentro una postazione sua (con `signKey`) e firma con quella. Il controllo della seq già vista (§3.6) non lo ferma | la postazione che ha rinnovato *n → n+1* (firmatari fissati e impegno, §3.6, §4.5); ogni postazione che ha già accettato la *n+1* vera (impegno) | le postazioni che non hanno ancora caricato la *n+1* vera: adottano la biforcazione. La postazione che ha rinnovato si ferma con errore `firma` (è il segnale) |
+| L2 | **una postazione tolta dentro un'epoca, senza rinnovo** | firmare su una seq vecchia in cui c'era ancora | chi ha già visto la seq che l'ha tolta (§3.6) | chi non l'ha vista. In DCAM nessuno è tolto dentro un'epoca (si toglie solo col rinnovo, §4.5): il controllo protegge un caso che l'applicazione non produce, e resta come difesa a costo nullo |
+| L3 | **un ex destinatario di qualunque epoca**, contro il **recupero 3-4 su un browser che non ha mai usato l'azienda** | l'ancora è solo C_1 e le chiusure `recovery` le può fare chiunque (la pubblica di RP è nell'elenco): da C_1 la catena si verifica con le firme del server, e una biforcazione da un'epoca *k* in cui l'ex destinatario c'era passa | il recupero su un browser che ha già usato l'azienda (parte dagli impegni salvati e dalla seq vista, §5.1) | il recupero su un browser nuovo |
+| L4 | **il server da solo**: dichiara revocata una postazione che non lo è (o toglie la sua chiusura) | la postazione dimentica la propria chiave e deve rientrare col codice T o col recupero (§4.2 punto 4) | — sullo stesso browser: seq vista, impegni e firmatari restano (§6.4) e valgono anche su quelle strade | la persona che, per rientrare, passa a un browser nuovo: lì il recupero parte solo da C_1 (L3) |
+| L5 | **un rinnovo concorrente di una postazione entrata dopo** l'ultimo caricamento di chi rinnova | — (non è un attacco) | — | la postazione che rinnova riceve un 409, e la *n+1* vera dell'altra è firmata da una postazione che non è fra i firmatari fissati: errore `firma`, si rientra col codice T. Falso allarme raro, a favore della sicurezza |
+| L6 | **chiunque abbia una firma valida** | una seconda firma valida dello stesso messaggio (malleabilità ECDSA: `(r, n−s)`); WebCrypto non impone la forma low-S | — | nessuno: la firma non identifica la transizione (il server la conserva per epoca, non per firma) e il messaggio firmato non cambia |
+
+Il protocollo protegge dal server, non da chi è dentro l'azienda: un destinatario attuale conosce
+già le chiavi che una biforcazione gli darebbe.
 
 ## 2. Chiavi
 
@@ -244,7 +248,9 @@ Codice: `chiudiElenco`/`apriElenco`/`conAggiunti`/`perRinnovo`/`chiusurePerEpoca
 
 Una chiave `E_{n+1}` vale solo se una **postazione dell'elenco n** l'ha firmata. Il server ha tutte
 le pubbliche e può chiudere per una postazione una chiave che conosce; non ha nessuna privata di
-firma né `E_n`, quindi non può né firmare né scrivere un elenco *n* con una postazione sua.
+firma né `E_n`, quindi non può né firmare né scrivere un elenco *n* con una postazione sua. Chi
+conosce `E_n` sì: con lui il server può firmare (§1, L1). Le difese contro questo caso stanno
+nella **memoria della postazione** qui sotto.
 
 ```
 C_n = HKDF(E_n, salt="", info="dcam.riservata.v2.commit")             // 32 byte
@@ -266,11 +272,28 @@ Chi verifica la transizione `n+1`, avendo già accettato `E_n`:
 chiave deve dare lo stesso (vale anche per le epoche **vecchie**: altrimenti il server, chiudendo
 una chiave sua per un'epoca passata, farebbe aprire oggetti falsi); se è nuova, deve avere la
 precedente accettata e una transizione che si verifica. Senza nessun impegno di partenza non si
-accetta niente. Se la postazione ha già aperto l'elenco dell'epoca *n* alla seq *s*, una
-transizione `n+1` firmata su una seq minore di *s* si rifiuta (errore `firma`): dentro un'epoca
-una postazione può uscire dall'elenco solo con una seq nuova, e non deve poter firmare su una seq
-vecchia in cui c'era ancora. Chi applica il protocollo lato server accetta la firma solo sull'ultima
-seq dell'epoca corrente.
+accetta niente.
+
+**La memoria della postazione** (`verificaChiavi(…, { visto, firmatari })`), persistente accanto
+agli impegni e usata su tutte le strade da cui arrivano chiavi (caricamento, codice T, recupero),
+quando il browser ha già usato l'azienda:
+
+- **seq vista** (`visto`): se la postazione ha già aperto l'elenco dell'epoca *n* alla seq *s*, una
+  transizione `n+1` firmata su una seq minore di *s* si rifiuta (errore `firma`). Ferma una
+  postazione tolta dentro un'epoca che firma su una seq vecchia; NON ferma chi conosce `E_n`, che
+  scrive un elenco a una seq più alta (§1, L1-L2);
+- **firmatari fissati** (`firmatari`: epoca → id delle postazioni): chi rinnova *n → n+1* fissa,
+  PRIMA di inviare, le postazioni con `signKey` dell'elenco *n+1* che ha costruito (quelle
+  dell'elenco *n* da cui parte meno quelle che toglie). Una `n+1` firmata da un'altra postazione —
+  la tolta, o una coniata in un elenco *n* da chi conosce `E_n` — si rifiuta (errore `firma`). Vale
+  anche se la risposta del server si perde, o se il server risponde «un altro ha rinnovato» (409):
+  la *n+1* vera di un altro amministratore, firmata da una postazione rimasta, passa;
+- **impegno di chi rinnova**: dopo la risposta positiva del server, chi ha rinnovato salva
+  l'impegno di `E_{n+1}` fra quelli accettati; da lì nessun'altra *n+1* passa, chiunque la firmi.
+  Non lo salva prima di inviare: se il rinnovo non arrivasse e un altro amministratore rinnovasse,
+  la postazione resterebbe fuori per sempre (la finestra è coperta dai firmatari fissati).
+
+Chi applica il protocollo lato server accetta la firma solo sull'ultima seq dell'epoca corrente.
 
 **L'ancora** (il primo impegno accettato) non viene mai dal server:
 
@@ -278,7 +301,7 @@ seq dell'epoca corrente.
 |---|---|
 | la postazione che attiva | genera `E_1`, ne calcola C_1 |
 | una postazione nuova (§4.3) | gli `E_n` del pacchetto chiuso con T (il server non conosce T): ne calcola gli impegni |
-| il recupero 3-4 (§5) | C_1, scritto dentro la privata di RP chiusa con R |
+| il recupero 3-4 (§5) | C_1, scritto dentro la privata di RP chiusa con R, più gli impegni che quel browser ha già accettato (§1, L3) |
 
 Il server conserva le transizioni accanto all'elenco *n+1* e le consegna con le chiusure.
 
@@ -349,9 +372,12 @@ nella vita breve del pacchetto; non c'è una chiave pubblica da confrontare a oc
    nell'elenco: il kit non serve per rinnovare).
 4. Firma la transizione `n+1` con la `F_d` della postazione da cui rinnova, sull'elenco *n* da cui
    è partito (§3.6).
-5. Invia tutto in una richiesta atomica.
+5. Fissa nella memoria della postazione i firmatari possibili di *n+1* (§3.6).
+6. Invia tutto in una richiesta atomica; alla risposta positiva salva l'impegno di `E_{n+1}`.
 
-Le postazioni della persona uscita non sono nell'elenco *n+1*: non firmano l'epoca *n+2*.
+Le postazioni della persona uscita non sono nell'elenco *n+1*: non firmano l'epoca *n+2*. Con il
+server possono ancora firmare una *n+1* diversa al posto di questa: la rifiutano chi ha rinnovato e
+chi ha già accettato la vera, non le altre (§1, L1).
 
 Dopo il rinnovo il server rifiuta le scritture con epoca inferiore alla corrente. La persona
 uscita conosce le chiavi fino all'epoca *n*: i dati scritti prima del rinnovo restano leggibili
@@ -365,7 +391,7 @@ per lei se ne aveva copia (limite della §1).
 |---|---|---|
 | 1 | un'altra postazione della persona | §4.3 |
 | 2 | un amministratore | §4.3 con chi autorizza = amministratore |
-| 3 | il kit (`R`) | `R` → apre la privata di RP e l'ancora C_1 → apre le chiusure `recovery` di tutte le epoche e le accetta con la §3.6 partendo da C_1 → nuova postazione e nuova `P_u`. Dopo l'uso si propone un kit nuovo |
+| 3 | il kit (`R`) | `R` → apre la privata di RP e l'ancora C_1 → apre le chiusure `recovery` di tutte le epoche e le accetta con la §3.6 partendo da C_1 e dagli impegni che il browser ha già accettato (un C_1 diverso da quello salvato: errore `firma`) → nuova postazione e nuova `P_u`. Su un browser nuovo l'ancora è solo C_1 (§1, L3). Dopo l'uso si propone un kit nuovo |
 | 4 | 2 parti su 3 fra `A` (kit), `B` (DCAM), `C` (terza persona) | si ricostruisce `R` nel browser, poi come il livello 3. Dopo l'uso il kit nuovo è obbligatorio |
 
 Le parti Shamir sono quelle della libreria `shamir-secret-sharing` (l'ultimo byte di ogni parte è

@@ -118,25 +118,40 @@ export async function verificaTransizione(
 const uguali = (a: Uint8Array, b: Uint8Array) =>
   a.length === b.length && a.every((x, i) => x === b[i]);
 
+/** Ciò che la postazione ricorda oltre agli impegni (protocollo §3.6). */
+export type Memoria = {
+  /**
+   * L'elenco più recente che questa postazione ha già aperto: una transizione dall'epoca
+   * `visto.epoch` deve essere firmata su quella seq o una successiva. NON ferma chi conosce
+   * E_n (scrive un elenco n a una seq più alta con una postazione sua): protegge solo da una
+   * postazione tolta dentro un'epoca senza rinnovo, che DCAM non produce (§1).
+   */
+  visto?: { epoch: number; seq: number };
+  /**
+   * Epoca → id delle postazioni che possono firmarla: chi rinnova n → n+1 le fissa PRIMA di
+   * inviare (le postazioni con `signKey` dell'elenco n da cui parte, meno quelle che toglie).
+   * Una n+1 firmata da un'altra (la tolta, o una postazione coniata con E_n) si rifiuta.
+   */
+  firmatari?: Map<number, readonly string[]>;
+};
+
 /**
  * Accetta le chiavi d'epoca solo se tornano con la catena (protocollo §3.6).
  * `fidati` = impegni già verificati (epoca → 32 byte): l'ancora, o ciò che la postazione ha
  * accettato in passato. Ogni chiave di un'epoca nota deve avere lo stesso impegno (anche le
  * VECCHIE: altrimenti il server inietterebbe oggetti in un'epoca passata); ogni epoca nuova deve
- * avere la precedente verificata e una transizione firmata. Restituisce una mappa NUOVA con gli
- * impegni verificati; `fidati` non si modifica.
- * `visto` = l'elenco più recente che questa postazione ha già aperto: una transizione dall'epoca
- * `visto.epoch` deve essere firmata su quella seq o una successiva. Dentro un'epoca l'elenco può
- * perdere una postazione solo con una seq nuova: senza questo controllo quella postazione
- * firmerebbe su una seq vecchia in cui c'era ancora.
+ * avere la precedente verificata e una transizione firmata (da uno dei `firmatari` dell'epoca,
+ * se la memoria li fissa). Restituisce una mappa NUOVA con gli impegni verificati; `fidati` non
+ * si modifica.
  */
 export async function verificaChiavi(
   orgId: string,
   chiavi: Map<number, Uint8Array>,
   fidati: Map<number, Uint8Array>,
   transizioni: Transizione[],
-  visto?: { epoch: number; seq: number }
+  memoria: Memoria = {}
 ): Promise<Map<number, Uint8Array>> {
+  const { visto, firmatari } = memoria;
   const out = new Map(fidati);
   const perEpoca = new Map(transizioni.map(t => [t.epoch, t]));
   for (const e of [...chiavi.keys()].sort((a, b) => a - b)) {
@@ -153,6 +168,10 @@ export async function verificaChiavi(
     if (!prec || !t) throw rifiuta(`l'epoca ${e} non si lega alla precedente`);
     if (visto && visto.epoch === e - 1 && t.prevSeq < visto.seq) {
       throw rifiuta(`l'epoca ${e} è firmata su un elenco più vecchio di quello già visto`);
+    }
+    const possibili = firmatari?.get(e);
+    if (possibili && !possibili.includes(t.signerId)) {
+      throw rifiuta(`l'epoca ${e} è firmata da ${t.signerId}, non da chi l'ha rinnovata`);
     }
     await verificaTransizione(orgId, prec, E, t);
     out.set(e, c);
