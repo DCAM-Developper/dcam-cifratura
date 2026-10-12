@@ -19,8 +19,12 @@ epoche e la sua API. Viene da una revisione indipendente della 0.2.0.
   concorrente di una postazione appena entrata; malleabilità ECDSA.
 - **SPEC §1, invariante:** la memoria della postazione cresce e basta, solo l'attivazione la
   azzera; ogni aggiornamento in un'unica transazione (due schede dello stesso browser).
-- **SPEC §3.6, §5.1:** la memoria della postazione (seq vista, firmatari, impegni) vale su tutte le
-  strade, compreso il recupero 3-4 su un browser che ha già usato l'azienda.
+- **SPEC §3.6, §5.1:** la memoria della postazione (seq vista, firmatari, impegni) è un obbligo di
+  chi applica il protocollo: va passata su tutte le strade, compreso il recupero 3-4 su un browser
+  che ha già usato l'azienda, e riletta con le epoche come numeri. Firmatari fissati vuoti per
+  un'epoca non lasciano firmare nessuno (test).
+- **SPEC §1, L1:** il rimedio alla biforcazione segnalata da chi ha rinnovato è riattivare
+  l'azienda (`E_1` nuova).
 
 ## 0.2.0 — 2026-10
 

@@ -84,7 +84,7 @@ che cosa diffidare. Ogni riga dice chi è esposto e chi no.
 
 | # | Chi, con il server | Che cosa ottiene | Chi lo rifiuta | Chi resta esposto |
 |---|---|---|---|---|
-| L1 | **chiunque conosca `E_n`** (un destinatario attuale o tolto dall'epoca *n*) | firmare un'epoca *n+1*: firmare vale quanto conoscere `E_n`, perché scrive un elenco *n* a una seq più alta con dentro una postazione sua (con `signKey`) e firma con quella. Il controllo della seq già vista (§3.6) non lo ferma | la postazione che ha rinnovato *n → n+1* (firmatari fissati e impegno, §3.6, §4.5); ogni postazione che ha già accettato la *n+1* vera (impegno) | le postazioni che non hanno ancora caricato la *n+1* vera: adottano la biforcazione. La postazione che ha rinnovato si ferma con errore `firma` (è il segnale) |
+| L1 | **chiunque conosca `E_n`** (un destinatario attuale o tolto dall'epoca *n*) | firmare un'epoca *n+1*: firmare vale quanto conoscere `E_n`, perché scrive un elenco *n* a una seq più alta con dentro una postazione sua (con `signKey`) e firma con quella. Il controllo della seq già vista (§3.6) non lo ferma | la postazione che ha rinnovato *n → n+1* (firmatari fissati e impegno, §3.6, §4.5); ogni postazione che ha già accettato la *n+1* vera (impegno) | le postazioni che non hanno ancora caricato la *n+1* vera: adottano la biforcazione. La postazione che ha rinnovato si ferma con errore `firma` (è il segnale). Ciò che le postazioni esposte scrivono sotto la *n+1* falsa lo legge la persona tolta, e restano sulla biforcazione: rimedio, riattivare l'azienda (`E_1` nuova, §4.1) |
 | L2 | **una postazione tolta dentro un'epoca, senza rinnovo** | firmare su una seq vecchia in cui c'era ancora | chi ha già visto la seq che l'ha tolta (§3.6) | chi non l'ha vista. In DCAM nessuno è tolto dentro un'epoca (si toglie solo col rinnovo, §4.5): il controllo protegge un caso che l'applicazione non produce, e resta come difesa a costo nullo |
 | L3 | **un ex destinatario di qualunque epoca**, contro il **recupero 3-4 su un browser che non ha mai usato l'azienda** | l'ancora è solo C_1 e le chiusure `recovery` le può fare chiunque (la pubblica di RP è nell'elenco): da C_1 la catena si verifica con le firme del server, e una biforcazione da un'epoca *k* in cui l'ex destinatario c'era passa | il recupero su un browser che ha già usato l'azienda (parte dagli impegni salvati e dalla seq vista, §5.1) | il recupero su un browser nuovo |
 | L4 | **il server da solo**: dichiara revocata una postazione che non lo è (o toglie la sua chiusura) | la postazione dimentica la propria chiave e deve rientrare col codice T o col recupero (§4.2 punto 4) | — sullo stesso browser: seq vista, impegni e firmatari restano (§6.4) e valgono anche su quelle strade | la persona che, per rientrare, passa a un browser nuovo: lì il recupero parte solo da C_1 (L3) |
@@ -282,8 +282,10 @@ precedente accettata e una transizione che si verifica. Senza nessun impegno di 
 accetta niente.
 
 **La memoria della postazione** (`verificaChiavi(…, { visto, firmatari })`), persistente accanto
-agli impegni e usata su tutte le strade da cui arrivano chiavi (caricamento, codice T, recupero),
-quando il browser ha già usato l'azienda:
+agli impegni. La libreria la usa solo se gliela si passa: **chi applica il protocollo deve
+passarla su tutte le strade** da cui arrivano chiavi (caricamento, codice T, recupero), quando il
+browser ha già usato l'azienda, e rileggerla com'era salvata (epoche come numeri: una memoria che
+non trova l'epoca non vincola niente):
 
 - **seq vista** (`visto`): se la postazione ha già aperto l'elenco dell'epoca *n* alla seq *s*, una
   transizione `n+1` firmata su una seq minore di *s* si rifiuta (errore `firma`). Ferma una

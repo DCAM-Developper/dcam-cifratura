@@ -370,5 +370,10 @@ describe('epoche firmate', () => {
     await expect(
       verificaChiavi(orgId, chiavi, fidati, [tolta], { firmatari: altri })
     ).resolves.toBeDefined();
+    // firmatari fissati ma vuoti per l'epoca: non firma nessuno, nemmeno la vera (si chiude, non si apre)
+    const vuoti = new Map([[2, new Map<string, string>()]]);
+    expect(await codice(verificaChiavi(orgId, chiavi, fidati, [vero], { firmatari: vuoti }))).toBe(
+      'firma'
+    );
   });
 });
