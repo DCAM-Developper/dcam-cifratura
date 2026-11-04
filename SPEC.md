@@ -418,10 +418,12 @@ la sua coordinata x). Due parti con la stessa coordinata si rifiutano prima di c
   nuovo. Una chiusura di lunghezza diversa si rifiuta (errore `formato`). La privata di custodia è generata fuori linea e non è in
   linea; la pubblica è in `src/custodia.ts`. Né un furto del database né un operatore con accesso
   al server hanno `B` in mano; e `B` da sola non ricostruisce `R`.
-- ⚠️ **In questa versione `src/custodia.ts` contiene una chiave di SVILUPPO dichiarata**
-  (`CUSTODIA_SVILUPPO = true`, privata distrutta). Chi integra deve rifiutare l'attivazione in
-  produzione finché vale `true`. La chiave definitiva sostituirà questo valore in una versione
-  successiva del pacchetto.
+- Dalla 0.4.0 `src/custodia.ts` contiene la **chiave definitiva** (`CUSTODIA_SVILUPPO = false`),
+  nata nella cerimonia del 2026-11-04: impronta `a14a2a9a5d9ec116` (le prime 16 cifre esadecimali
+  di `sha256` della stringa base64url di 87 caratteri). La privata esiste solo su carta. Fino alla
+  0.3.0 c'era una chiave di sviluppo dichiarata (`CUSTODIA_SVILUPPO = true`, privata distrutta): le
+  parti `B` chiuse per quella non si aprono più. Chi integra continua a rifiutare l'attivazione in
+  produzione se `CUSTODIA_SVILUPPO` vale `true`.
 - La consegna di `B` al cliente avviene fuori linea, dopo una verifica d'identità.
 
 ## 6. Sincronizzazione, conflitti, ricerca

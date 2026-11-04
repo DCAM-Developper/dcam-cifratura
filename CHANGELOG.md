@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — 2026-11
+
+Protocollo **v2** invariato nei formati (stessi vettori `vettori/v2.json`); cambia la chiave di custodia.
+
+- **Chiave di custodia definitiva (SPEC §5.2).** `CUSTODIA_PUBBLICA` è la chiave nata nella
+  cerimonia del 2026-11-04 (impronta `a14a2a9a5d9ec116`, privata solo su carta) e
+  `CUSTODIA_SVILUPPO` vale `false`. Le parti `B` chiuse per la chiave di sviluppo delle versioni
+  precedenti non si aprono con questa.
+
 ## 0.3.0 — 2026-10
 
 Protocollo **v2** invariato nei formati (stessi vettori `vettori/v2.json`); cambia la verifica delle
